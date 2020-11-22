@@ -151,8 +151,8 @@ export type logEvent = {
 
 type LogParam = {
   level: LogLevel;
-  trace: string;
-  payload: string;
+  trace: Array<string>;
+  payload: Array<string>;
 };
 
 type LogLevel =
