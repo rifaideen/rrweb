@@ -73,6 +73,7 @@ export enum IncrementalSource {
   StyleSheetRule,
   CanvasMutation,
   Font,
+  Log,
 }
 
 export type mutationData = {
@@ -117,6 +118,10 @@ export type fontData = {
   source: IncrementalSource.Font;
 } & fontParam;
 
+export type logData = {
+  source: IncrementalSource.Log;
+} & LogParam;
+
 export type incrementalData =
   | mutationData
   | mousemoveData
@@ -127,7 +132,8 @@ export type incrementalData =
   | mediaInteractionData
   | styleSheetRuleData
   | canvasMutationData
-  | fontData;
+  | fontData
+  | logData;
 
 export type event =
   | domContentLoadedEvent
@@ -135,7 +141,28 @@ export type event =
   | fullSnapshotEvent
   | incrementalSnapshotEvent
   | metaEvent
-  | customEvent;
+  | customEvent
+  | logEvent;
+
+export type logEvent = {
+  type: EventType.IncrementalSnapshot;
+  data: incrementalData;
+};
+
+type LogParam = {
+  level: LogLevel;
+  trace: string;
+  payload: string;
+};
+
+type LogLevel =
+  | 'log'
+  | 'info'
+  | 'warn'
+  | 'error'
+  | 'debug'
+  | 'assert'
+  | 'trace';
 
 export type eventWithTime = event & {
   timestamp: number;
