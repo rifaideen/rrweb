@@ -14,6 +14,7 @@ import {
   recordOptions,
   IncrementalSource,
   listenerHandler,
+  LogRecordOptions,
 } from '../types';
 
 function wrapEvent(e: event): eventWithTime {
@@ -44,6 +45,7 @@ function record<T = eventWithTime>(
     mousemoveWait,
     recordCanvas = false,
     collectFonts = false,
+    recordLog = false,
   } = options;
   // runtime checks for user options
   if (!emit) {
@@ -76,6 +78,38 @@ function record<T = eventWithTime>(
       : _maskInputOptions !== undefined
       ? _maskInputOptions
       : {};
+
+  const defaultLogOptions: LogRecordOptions = {
+    level: [
+      'assert',
+      'clear',
+      'count',
+      'countReset',
+      'debug',
+      'dir',
+      'dirxml',
+      'error',
+      'group',
+      'groupCollapsed',
+      'groupEnd',
+      'info',
+      'log',
+      'table',
+      'time',
+      'timeEnd',
+      'timeLog',
+      'trace',
+      'warn',
+    ],
+    lengthThreshold: 1000,
+    logger: console,
+  };
+
+  const logOptions: LogRecordOptions = recordLog
+    ? recordLog === true
+      ? defaultLogOptions
+      : Object.assign({}, defaultLogOptions, recordLog)
+    : {};
 
   polyfill();
 
@@ -291,6 +325,16 @@ function record<T = eventWithTime>(
                   },
                 }),
               ),
+            logCb: (p) =>
+              wrappedEmit(
+                wrapEvent({
+                  type: EventType.IncrementalSnapshot,
+                  data: {
+                    source: IncrementalSource.Log,
+                    ...p,
+                  },
+                }),
+              ),
             blockClass,
             ignoreClass,
             maskInputOptions,
@@ -299,6 +343,7 @@ function record<T = eventWithTime>(
             sampling,
             recordCanvas,
             collectFonts,
+            logOptions,
           },
           hooks,
         ),
